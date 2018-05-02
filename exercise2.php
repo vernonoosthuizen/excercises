@@ -13,16 +13,8 @@ function fibonacci($number)
     if ($number == 0) return 0;
     elseif ($number == 1) return 1;
 
-    $first = 0;
-    $second = 1;
+    return fibonacci($number-2)+fibonacci($number-1);
 
-    for ($i=1; $i < $number; $i++){
-        $placeholder = $first;
-        $first = $second;
-        $second += $placeholder;
-    }
-
-    return $second;
 }
 
 $i=0;
