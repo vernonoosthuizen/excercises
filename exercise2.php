@@ -6,7 +6,7 @@
  * Time: 9:32 AM
  */
 
-$maximumNumber = isset($_POST['maximum']) ? $_POST['maximum'] : 34;
+$maximumNumber = isset($_POST['maximum']) ? $_POST['maximum'] : 9;
 
 function fibonacci($number)
 {
@@ -15,13 +15,15 @@ function fibonacci($number)
     return fibonacci($number-2)+fibonacci($number-1);
 }
 
-$i=0;
-while ($i < $maximumNumber) {
+$i = $counter = 0;
+while ($counter <= $maximumNumber) {
     $holder = fibonacci($i);
-    if ($holder > $maximumNumber) $i = $maximumNumber;
-    else{
+
+    if ($holder > $maximumNumber) {
+        $counter = $maximumNumber + 1;
+    } else {
+        echo $holder . ' ';
         $i++;
-        echo $holder. ' ';
     }
 }
 
