@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exercise 5</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+    function postMaximum()
+    {
+        $.post('exercise2.php', {'maximum': $('#maximum').val()},
+            function(returned)
+            {
+                console.log(returned);
+                $('#result').html(returned);
+            }
+        );
+    }
+</script>
+    <label for="maximum">Maximum Number:</label>
+    <input type="number" name="maximum" id="maximum" required>
+    <input type="button" value="Submit" onclick="return postMaximum();">
+<div id="result"></div>
+</body>
+</html>
