@@ -27,7 +27,6 @@ function fibonacci($number)
 
 $i=0;
 while ($i < $maximumNumber) {
-
     $holder = fibonacci($i);
     if ($holder > $maximumNumber) $i = $maximumNumber;
     else{
