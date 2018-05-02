@@ -14,7 +14,7 @@ if (!$conn) die('Connection failed');
 class Person{
 
     var $Firstname, $Surname, $DateOfBirth, $EmailAddress = '';
-    var $Age = 0;
+    var $Age, $id = 0;
 
     function createPerson(){
         global $conn;
@@ -35,14 +35,20 @@ class Person{
 
     function loadAllPeople(){
         global $conn;
+        $Return = [];
+        $people = mysqli_query($conn, "select id, Firstname, Surname, EmailAddress, DateOfBirth, Age from Person");
+        while ($PersonDetails = mysqli_fetch_assoc($people)) $Return[$PersonDetails['id']] = $PersonDetails;
+        return $Return;
     }
 
     function deleteAllPeople(){
         global $conn;
+        mysqli_query($conn, "delete from Person");
     }
 }
 
-/*
+person::deleteAllPeople();
+
 for ($i=0; $i < 10; $i++)
 {
     $person = new Person();
@@ -53,7 +59,6 @@ for ($i=0; $i < 10; $i++)
     $person->Age = 10*$i;
     $person->createPerson();
 }
-*/
 
 echo '<table>
 <tr><th colspan="5">People</th></tr>
@@ -64,9 +69,8 @@ echo '<table>
     <td style="text-align: center; font-weight: bold;">DateOfBirth</td>
     <td style="text-align: center; font-weight: bold;">Age</td>
 </tr>';
-$people = mysqli_query($conn, "select Firstname, Surname, EmailAddress, DateOfBirth, Age from Person");
-
-while ($PersonDetails = mysqli_fetch_assoc($people)){
+foreach (person::loadAllPeople() as $PersonDetails)
+{
     echo <<<HTML
     <tr>
         <td>$PersonDetails[Firstname]</td>
@@ -78,8 +82,6 @@ while ($PersonDetails = mysqli_fetch_assoc($people)){
 HTML;
 
 }
-//for ($i=0; $i < 1000000; $i++){echo $i;}
-
 
 echo '</table>';
 $ScriptEnd = microtime(true);
