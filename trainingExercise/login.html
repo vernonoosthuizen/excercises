@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+<div class="container" style=" margin: 10% auto;">
+    <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-4 float-none;" style="margin: 0 auto; text-align: center; border: 1px solid #cccccc; background-color: #e3e3e3;">
+            <br><h1>Welcome</h1><br>
+            <div style="max-width: 330px; margin: 0 auto;">
+                <input type="text" name="name" id="name" class="form-control" placeholder="Username" autofocus><br>
+                <input type="password" name="psswrd" id="psswrd" class="form-control" placeholder="Password"><br>
+                <input type="button" name="Command" class="btn btn-lg btn-primary" value="Login" id="LoginBtn" style="width: 100%">
+                <i class="fa fa-spinner fa-spin" id="loading" style="font-size:46px; display: none;"></i>
+                <br><br>
+            </div>
+            <!--<div>
+                <a href="#">Register</a> - <a href="#">Forgot Password</a>
+            </div>-->
+        </div>
+        <div class="col-md-4"></div>
+    </div>
+</div>
+<script>
+    function loginUser()
+    {
+        $.post('login.php', {
+            'Command': 'Login',
+            'Username': $('#name').val(),
+            'Password': $('#psswrd').val()
+        }, function(response) {
+            if (response == 'success') {
+                window.location = 'index.php';
+            }
+            else {
+                console.log(response);
+                alert('Login failed, please try again!');
+                $("#LoginBtn").attr('disabled', false);
+                $("#LoginBtn").show();
+                $('#loading').hide();
+            }
+        });
+    }
+
+    $("#LoginBtn").on('click', function(){
+        $(this).attr('disabled', true);
+        $(this).hide();
+        //load spinner
+        $('#loading').show();
+        loginUser();
+        });
+</script>
+</body>
+</html>
