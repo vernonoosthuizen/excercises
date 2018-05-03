@@ -167,6 +167,7 @@ function updatePerson(PersonID)
         'Age': $('#Age').val()
     }, function(){ window.location=window.location; });
 }
+
 </script>
 JS;
 
