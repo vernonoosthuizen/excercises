@@ -28,7 +28,7 @@ class Person{
         $Details = mysqli_fetch_assoc($Result);
         $this->Firstname = $Details['Firstname'];
         $this->Surname = $Details['Surname'];
-        $this->DateOfBirth = $Details['DateOfBirth'];
+        $this->DateOfBirth = date('Y-m-d', strtotime($Details['DateOfBirth']));
         $this->EmailAddress = $Details['EmailAddress'];
         $this->Age = $Details['Age'];
     }
@@ -134,7 +134,10 @@ function editPerson(PersonID)
             $('#EmailAddress').val(data.EmailAddress);
             $('#Age').val(data.Age);
             
-            $('#AddSaveBtn').val('Update').prop('onclick', null).on('click', function(){ updatePerson(PersonID) });
+            $('#AddBtn').hide();
+            $('#SaveBtn').show();
+            $('#SaveBtn').on('click', function(){ updatePerson(PersonID); });
+          //  $('#AddSaveBtn').on('click', function(){ updatePerson(PersonID) });
             $('#CancelBtn').show();
         }, "json");
 }
@@ -147,7 +150,8 @@ function clearFields()
     $('#EmailAddress').val('');
     $('#Age').val('');
     
-    $('#AddSaveBtn').val('Add').prop('onclick', function(){ addPerson(); });
+    $('#AddBtn').show();
+    $('#SaveBtn').hide();
     $('#CancelBtn').hide();
 }
 
@@ -205,7 +209,7 @@ echo <<<HTML
     <td><input type="text" name="DateOfBirth" id="DateOfBirth"></td>
     <td><input type="text" name="EmailAddress" id="EmailAddress"></td>
     <td><input type="text" name="Age" id="Age"></td>
-    <td><input type="button" value="Add" id="AddSaveBtn" onclick="addPerson()"></td>
+    <td><input type="button" value="Add" id="AddBtn" onclick="addPerson()"><input type="button" value="Update" id="SaveBtn" style="display: none;"></td>
     <td><input type="button" value="Cancel" id="CancelBtn" style="display:none;" onclick="clearFields()"></td>
 </tr>
 </table>
