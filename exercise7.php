@@ -212,7 +212,7 @@ echo <<<HTML
     <td><input type="button" value="Add" id="AddBtn" onclick="addPerson()"><input type="button" value="Update" id="SaveBtn" style="display: none;"></td>
     <td><input type="button" value="Cancel" id="CancelBtn" style="display:none;" onclick="clearFields()"></td>
 </tr>
-</table>
+</table> 
 HTML;
 
 ?>
