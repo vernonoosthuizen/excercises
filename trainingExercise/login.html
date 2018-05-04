@@ -15,14 +15,21 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
-<div class="container" style=" margin: 10% auto;">
+<div class="container" id="mainContainer" style=" margin: 5% auto;">
+    <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-4 float-none;" style="margin: 0 auto; text-align: center; ">
+            <div id="errorMessage" style="color: red;">&nbsp;</div>
+        </div>
+        <div class="col-md-4"></div>
+    </div>
     <div class="row">
         <div class="col-md-4"></div>
         <div class="col-md-4 float-none;" style="margin: 0 auto; text-align: center; border: 1px solid #cccccc; background-color: #e3e3e3;">
             <br><h1>Welcome</h1><br>
             <div style="max-width: 330px; margin: 0 auto;">
-                <input type="text" name="name" id="name" class="form-control" placeholder="Username" autofocus><br>
-                <input type="password" name="psswrd" id="psswrd" class="form-control" placeholder="Password"><br>
+                <input type="text" name="name" id="name" class="form-control" placeholder="Username" autofocus onkeypress="submitInputs(event);"><br>
+                <input type="password" name="psswrd" id="psswrd" class="form-control" placeholder="Password" onkeypress="submitInputs(event);"><br>
                 <input type="button" name="Command" class="btn btn-lg btn-primary" value="Login" id="LoginBtn" style="width: 100%">
                 <i class="fa fa-spinner fa-spin" id="loading" style="font-size:46px; display: none;"></i>
                 <br><br>
@@ -34,34 +41,67 @@
         <div class="col-md-4"></div>
     </div>
 </div>
-<script>
+<script type="text/javascript">
+
+    function checkIfLoggedIn(){
+        $.post('loggedIn.php', function(response){
+            if (response === 'true') window.location='index.html';
+            else $('#mainContainer').show();
+        })
+    }
+
+    function submitInputs(e){
+        if (e.keyCode === 13) {
+            e.preventDefault();
+            loginUser();
+        }
+    }
+
     function loginUser()
     {
-        $.post('login.php', {
-            'Command': 'Login',
-            'Username': $('#name').val(),
-            'Password': $('#psswrd').val()
-        }, function(response) {
-            if (response == 'success') {
-                window.location = 'index.php';
-            }
-            else {
-                console.log(response);
-                alert('Login failed, please try again!');
-                $("#LoginBtn").attr('disabled', false);
-                $("#LoginBtn").show();
-                $('#loading').hide();
-            }
-        });
+        if ($('#name').val() != '' &&  $('#psswrd').val() != '')
+        {
+            $("#LoginBtn").attr('disabled', true);
+            $("#LoginBtn").hide();
+            //load spinner
+            $('#loading').show();
+            $.post('login.php', {
+                'Command': 'Login',
+                'Username': $('#name').val(),
+                'Password': $('#psswrd').val()
+            }, function(response) {
+                if (response == 'success') {
+                    window.location = 'index.html';
+                }
+                else {
+                    if (response === 'Login attempts')
+                    {
+                        $("#LoginBtn").show();
+                        $('#loading').hide();
+                        sMessage = 'Multiple failed login attempts, please try again in a few minutes';
+                        $("#LoginBtn").attr('disabled', 'disabled');
+                    }
+                    else {
+                        sMessage = 'Login failed, please try again!';
+
+                        $("#LoginBtn").attr('disabled', false);
+                        $("#LoginBtn").show();
+                        $('#loading').hide();
+                    }
+                    $('#errorMessage').fadeIn(1, function() {
+                        $(this).html('<b>'+sMessage+'</b>');
+                    });
+
+                }
+            });
+        }
     }
 
     $("#LoginBtn").on('click', function(){
-        $(this).attr('disabled', true);
-        $(this).hide();
-        //load spinner
-        $('#loading').show();
         loginUser();
-        });
+    });
+
+    checkIfLoggedIn();
 </script>
 </body>
 </html>
