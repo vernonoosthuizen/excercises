@@ -27,7 +27,11 @@ if (mysqli_num_rows($rCount) > 4) die('Login attempts');
 //log all attempts
 mysqli_query($conn,"insert into LoginAttempt (IPAddress, AttemptTime, Username) values ('$sIPAddress', '$sAttemptTime', '$sUsername')");
 
-if ($sUsername == '' || $sPassword == '') die('Failed');
+if ($sUsername == '' || $sPassword == '')
+{
+    header('Location: login.html');
+    die('Failed');
+}
 
 $sPassword = md5($sPassword);
 $Authenticate = mysqli_query($conn,"select id from User where Username='$sUsername' and Password='$sPassword'");

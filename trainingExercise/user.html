@@ -40,34 +40,36 @@
     <div class="row">
     <div class="col-md-4"></div>
     <div class="col-md-4">
+        <div id="errorDiv" style="display: none;'"><div id="errorDivMessage" class="alert alert-danger" role="alert"></div></div>
         <div class="panel panel-primary">
             <div class="panel-heading"><h3 class="panel-title">User Details</h3></div>
-                <form role="search" style="padding: 10px;">
+                <form role="search" id="userForm" style="padding: 10px;">
                     <div class="form-group">
                         <label for="FirstName">Firstname</label>
-                        <input type="text" class="form-control" placeholder="Firstname" id="FirstName">
+                        <input type="text" class="form-control" placeholder="Firstname" id="FirstName" required data-validation="required" maxlength="50" onkeyup="submitInputs(event)">
                     </div>
                     <div class="form-group">
                         <label for="LastName">Lastname</label>
-                        <input type="text" class="form-control" placeholder="Lastname" id="LastName">
+                        <input type="text" class="form-control" placeholder="Lastname" id="LastName" required data-validation="required" maxlength="50" onkeyup="submitInputs(event)">
                     </div>
                     <div class="form-group">
                         <label for="EmailAddress">Email Address</label>
-                        <input type="text" class="form-control" placeholder="Email Address" id="EmailAddress">
+                        <input type="email" class="form-control" placeholder="Email Address" id="EmailAddress" required data-validation="email" maxlength="127" onkeyup="submitInputs(event)">
                     </div>
                     <div class="form-group">
                         <label for="Username">Username</label>
-                        <input type="text" class="form-control" placeholder="Username" id="Username">
+                        <input type="text" class="form-control" placeholder="Username" id="Username" required data-validation="required" maxlength="127" onkeyup="submitInputs(event)">
                     </div>
                     <div class="form-group">
                         <label for="OldPassword">Old Password</label>
-                        <input type="text" class="form-control" placeholder="Old Password" id="OldPassword">
+                        <input type="password" class="form-control" placeholder="Old Password" id="OldPassword" autocomplete="false" onkeyup="submitInputs(event)">
                     </div>
                     <div class="form-group">
                         <label for="NewPassword">New Password</label>
-                        <input type="text" class="form-control" placeholder="New Password" id="NewPassword">
+                        <input type="password" class="form-control" placeholder="New Password" id="NewPassword" autocomplete="false" onkeyup="submitInputs(event)">
                     </div>
-                    <button type="submit" class="btn btn-primary pull-right">Update</button><br><br>
+                    <button type="button" class="btn btn-primary pull-left" onclick="window.location='index.html';">Back</button>
+                    <button type="button" class="btn btn-primary pull-right" onclick="updateUser()">Update</button><br><br>
                 </form>
         </div>
     </div>
@@ -75,14 +77,149 @@
     </div>
 </div>
 <script type="text/javascript">
+
+function submitInputs(e){
+    if (e.keyCode === 13) {
+        e.preventDefault();
+        updateUser();
+    }
+}
+
+function checkIfLoggedIn(){
+    $.post('loggedIn.php', function(response){
+        if (response !== 'true') window.location='login.html';
+    })
+}
+
 $(function(){
+
+    checkIfLoggedIn();
+
     $.post('user.php', {'command': 'GetUserDetails'}, function(response){
-console.log(response);
         $('#FirstName').val(response.sFirstName);
         $('#LastName').val(response.sLastName);
         $('#EmailAddress').val(response.sEmailAddress);
         $('#Username').val(response.sUsername);
     }, "json");
+});
+
+function updateUser() {
+    if (validation()) {
+        if ($('#NewPassword').val() != '') {
+            if ($('#OldPassword').val() != '') {
+                //console.log('check old password entered with stored password');
+                $.post('user.php', {
+                    'command': 'CheckOldPassword',
+                    'OldPassword': $('#OldPassword').val()
+                }, function (response) {
+                    if (response === 'same') {
+                        //console.log('old password matches and new password entered, now update all with new values');
+                        $.post('user.php', {
+                            'command': 'UpdateUser',
+                            'FirstName': $('#FirstName').val(),
+                            'LastName': $('#LastName').val(),
+                            'EmailAddress': $('#EmailAddress').val(),
+                            'Username': $('#Username').val(),
+                            'Password': $('#NewPassword').val()
+                        }, function (response) {
+                            $('#errorDiv').fadeIn().html('<div class="alert alert-success" role="alert" id="errorDivMessage"><b>Updated successfully!</b></div>');
+                            $('#errorDiv').delay(1200).fadeOut(function () {
+                                $('#OldPassword').val('');
+                                $('#NewPassword').val('');
+                            });
+                        })
+                    }
+                    else {
+                        // console.log('old and new passwords does not match');
+                        $('#errorDiv').fadeIn().html('<div class="alert alert-danger" role="alert" id="errorDivMessage"><b>Old Password does not match!</b></div>');
+                        $('#errorDiv').delay(1200).fadeOut();
+                    }
+                });
+            }
+            else {
+                //  console.log('Old Password is needed to update the new password');
+                $('#errorDiv').fadeIn().html('<div class="alert alert-danger" role="alert" id="errorDivMessage"><b>Old Password required to update password!</b></div>');
+                $('#errorDiv').delay(1200).fadeOut();
+            }
+        }
+        else {
+            $.post('user.php', {
+                'command': 'UpdateUser',
+                'FirstName': $('#FirstName').val(),
+                'LastName': $('#LastName').val(),
+                'EmailAddress': $('#EmailAddress').val(),
+                'Username': $('#Username').val()
+            }, function (response) {
+                // console.log('Password change not requested save rest of the fields');
+                $('#errorDiv').fadeIn().html('<div class="alert alert-success" role="alert" id="errorDivMessage"><b>Updated successfully!</b></div>');
+                $('#errorDiv').delay(1200).fadeOut(function () {
+                    $('#OldPassword').val('');
+                    $('#NewPassword').val('');
+                });
+            })
+        }
+    }
+}
+
+function validation(clearErrors=0){
+    var returnVal = true;
+    var errors = '';
+
+    if (clearErrors){
+        $('input[required]').each(function() {
+            $(this).parent('div').removeClass('has-error');
+            if ($(this).val() == '') {
+                $(this).parent('div').addClass('has-error');
+            }
+        });
+
+        $('input[data-validation="email"]').each(function(){
+            var pattern = /^\b[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b$/i;
+
+            if(!pattern.test($(this).val())) {
+                $(this).parent('div').addClass('has-error');
+            }
+        });
+        return true;
+    }
+
+    $('input[required]').each(function(){
+        $(this).parent('div').removeClass('has-error');
+        $(this).val($.trim($(this).val()));
+        if ($(this).val() == '') {
+            errors += '- '+$("label[for='"+$(this).attr('id')+"']").text()+" required <br>";
+            $(this).parent('div').addClass('has-error');
+            returnVal = false;
+        }
+        else
+        {
+            console.log($(this).val().length);
+        }
+    });
+
+    $('input[data-validation="email"]').each(function(){
+        var pattern = /^\b[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b$/i;
+        $(this).val($.trim($(this).val()));
+        if(!pattern.test($(this).val())) {
+            errors += '- '+$("label[for='"+$(this).attr('id')+"']").text()+" incorrect <br>";
+            $(this).parent('div').addClass('has-error');
+            returnVal = false;
+        }
+    });
+
+    if (!returnVal){
+        $('#errorDiv').fadeIn().html('<div class="alert alert-danger" role="alert" id="errorDivMessage"><b>'+errors+'</b></div>');
+        $('#errorDiv').delay(1200).fadeOut();
+    }
+   return returnVal;
+}
+
+$(function(){
+    $('input[type="text"]').each(function(){
+        $(this).on('blur', function() {
+            validation(1);
+        });
+    });
 })
 </script>
 </body>

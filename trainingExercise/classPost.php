@@ -63,6 +63,8 @@ class Post{
         $oUser = new User();
         $oUser->iUserId = $this->iUserPostedId;
         $oUser->getUser();
+
+        $this->sPostText = str_replace("\n",'<br>',$this->sPostText);
         return <<<HTML
         <div class="media">
             <div class="media-left">

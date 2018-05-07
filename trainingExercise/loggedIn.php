@@ -8,6 +8,6 @@
 
 require_once 'connect.php';
 
-if (isset($_SESSION['UserId']) && $_SESSION['UserId']) echo 'true';
+if (isset($_SESSION['UserId']) && $_SESSION['UserId']) die('true');
 
 die;

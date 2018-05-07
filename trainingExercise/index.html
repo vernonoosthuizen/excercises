@@ -39,15 +39,16 @@
     <div class="row">
         <div class="col-md-2"></div>
         <div class="col-md-8">
-            <div class="well" style="padding: 12px;">
-                <h4>What is on your mind?</h4>
-                    <div class="form-group">
-                        <textarea class="form-control" rows="3" id="postText" style="width: 90%"></textarea>
-                        <button type="submit" class="btn btn-primary pull-right" onclick="postPost();" style="position: relative; top: -50px;">Post</button>
-                    </div>
+            <div id="errorDiv" style="display: none;'"><div id="errorDivMessage" class="alert alert-danger" role="alert"></div></div>
+            <div class="well">
+                <table width="100%"><tr><td>
+                        <textarea class="form-control" rows="3" id="postText" style="width: 99%" placeholder="What is on your mind?"></textarea>
+                    </td><td style="width: 10px">
+                    <button type="submit" id="postBtn" class="btn btn-primary pull-right" onclick="postPost();">Post</button></td></tr>
+                </table>
             </div>
             <div class="panel panel-primary">
-                <div class="panel-heading"><h3 class="panel-title">Posts</h3></div>
+                <div class="panel-heading"><h3 class="panel-title">Updates</h3></div>
                 <div class="panel-body" id="PostListDiv"></div>
             </div>
         </div>
@@ -55,14 +56,33 @@
     </div>
 </div>
 <script type="text/javascript">
+
+    function checkIfLoggedIn(){
+        $.post('loggedIn.php', function(response){
+            if (response !== 'true') window.location='login.html';
+           // else
+        })
+    }
+
+    checkIfLoggedIn();
+
     function postPost()
     {
+        $('#postText').val($.trim($('#postText').val()));
         if ($('#postText').val() != '') {
             $.post('posts.php', {'command': 'Create', 'PostText': $('#postText').val()}, function() {
                 $.post('posts.php', {'command': 'GetAllPosts'}, function(response){
                     $('#PostListDiv').html(response);
                     $('#postText').val('');
                 });
+            });
+        }
+        else
+        {
+            $('#postBtn').attr('disabled', 'disabled');
+            $('#errorDiv').fadeIn().html('<div class="alert alert-danger" role="alert" id="errorDivMessage"><b>Are you saying that your mind is empty?</b></div>');
+            $('#errorDiv').delay(1600).fadeOut(function(){
+                $('#postBtn').removeAttr("disabled");
             });
         }
     }

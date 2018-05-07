@@ -13,7 +13,7 @@ require_once 'classPost.php';
 #INPUT
 $iUserId = isset($_SESSION['UserId']) ? $_SESSION['UserId'] : 0;
 $sCommand = isset($_POST['command']) ? $_POST['command'] : '';
-$sPostText = isset($_POST['PostText']) ? $_POST['PostText'] : '';
+$sPostText = isset($_POST['PostText']) ? htmlentities(trim($_POST['PostText']), ENT_NOQUOTES) : '';
 
 #PROCESSING
 $oPost = new Post();

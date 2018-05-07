@@ -21,4 +21,10 @@ class User{
             $this->sPassword = $aUser['Password'];
         }
     }
+
+    function updateUser(){
+        global $conn;
+        $sPasswordSQL = ($this->sPassword != '') ? ", Password='$this->sPassword'" : '';
+        mysqli_query($conn, "update User set FirstName='$this->sFirstName', LastName='$this->sLastName', EmailAddress='$this->sEmailAddress', Username='$this->sUsername' $sPasswordSQL where id=$this->iUserId");
+    }
 }
