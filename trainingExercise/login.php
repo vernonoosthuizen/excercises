@@ -19,7 +19,7 @@ $sTimeTenMinutesAgo = date('Y-m-d H:i:s', time() - 60*10);
 mysqli_query($conn, "delete from LoginAttempt where AttemptTime < '$sTimeTenMinutesAgo'");
 
 //select all attempts for the last 10min from this IP and block if more than 5
-$rCount = mysqli_query($conn, "select id from LoginAttempt where AttemptTime > '$sTimeTenMinutesAgo' and IPAddress='$sIPAddress'");
+$rCount = mysqli_query($conn, "select id from LoginAttempt where AttemptTime > '$sTimeTenMinutesAgo' and Username='$sUsername'");
 if (mysqli_num_rows($rCount) > 4) die('Login attempts');
 
 if ($sUsername == '' || $sPassword == '')
@@ -32,16 +32,20 @@ if ($sUsername == '' || $sPassword == '')
     die('Failed');
 }
 
-$sPassword = md5($sPassword);
-$Authenticate = mysqli_query($conn,"select id from User where Username='$sUsername' and Password='$sPassword'");
+$Authenticate = mysqli_query($conn,"select id, Password from User where Username='$sUsername'");
 while ($aUser = mysqli_fetch_assoc($Authenticate))
 {
-    $_SESSION['UserId'] = $aUser['id'];
-    die('success');
+    if (password_verify($sPassword, $aUser['Password'])) {
+        $_SESSION['UserId'] = $aUser['id'];
+        die('success');
+    }
 }
 
 //log all attempts
 mysqli_query($conn,"insert into LoginAttempt (IPAddress, AttemptTime, Username) values ('$sIPAddress', '$sAttemptTime', '$sUsername')");
 
 
+//$HashedPassword = password_hash("123", CRYPT_SHA256);
+//$isCorrect = password_verify("123",password_hash("123"));
+//echo $isCorrect ? "Yay! $isCorrect":"Awh $isCorrect";
 ?>

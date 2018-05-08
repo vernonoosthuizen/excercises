@@ -120,7 +120,8 @@ function checkUsername(){
 }
 
 function checkEmail(){
-    $.post('user.php', {'command': 'CheckEmail', 'EmailAddress': $('#EmailAddress').val()}, function(response){
+    $.post('user.php', {'command': 'CheckEmail' +
+        '', 'EmailAddress': $('#EmailAddress').val()}, function(response){
         if (response == 'not used') {
             checkAll(); }
         else

@@ -11,9 +11,9 @@ session_start();
 $conn = mysqli_connect('localhost', 'vernon', 'v3rn0n', 'trainingExercise', 3307);
 if (!$conn) die('Connection Failed!');
 
-#TODO: this should move to another page maybe
-foreach ($_POST as $key=>$value)
-{
+// VON: TODO: this should move to another page maybe
+#investigate prepared statements as alternatives
+foreach ($_POST as $key=>$value) {
     $_POST[$key] = mysqli_real_escape_string($conn, $value);
 }
 

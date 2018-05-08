@@ -31,10 +31,10 @@ elseif ($sCommand == 'UpdateUser' && $iUserId) {
     $oUser->iUserId = $iUserId;
     if (!empty($sFirstName)) $oUser->sFirstName = $sFirstName;
     if (!empty($sLastName))  $oUser->sLastName = $sLastName;
-    if (!empty($sEmailAddress)) $oUser->sEmailAddress = $sEmailAddress;
+    if (!empty($sEmailAddress) && $oUser->checkUserEmail($sEmailAddress) == 'not used') $oUser->sEmailAddress = $sEmailAddress;
 
-    if (!empty($sUsername)) $oUser->sUsername = $sUsername;
-    if (!empty($sPassword)) $oUser->sPassword = md5($sPassword);
+    if (!empty($sUsername) && $oUser->checkUsername($sUsername) == 'not used') $oUser->sUsername = $sUsername;
+    if (!empty($sPassword)) $oUser->sPassword = password_hash($sPassword, CRYPT_SHA256);
     $oUser->updateUser();
     die;
 }
@@ -42,25 +42,22 @@ elseif ($sCommand == 'CheckUsername' && $iUserId)
 {
     $oUser = new User();
     $oUser->iUserId = $iUserId;
-    $iUsernameUsed = mysqli_num_rows(mysqli_query($conn, "select id from User where Username='$sUsername' and id != $iUserId"));
-    if ($iUsernameUsed) echo 'used';
-    else echo 'not used';
+    echo $oUser->checkUsername($sUsername);
     die;
 }
 elseif ($sCommand == 'CheckEmail' && $iUserId)
 {
     $oUser = new User();
     $oUser->iUserId = $iUserId;
-    $iEmailUsed = mysqli_num_rows(mysqli_query($conn, "select id from User where EmailAddress='$sEmailAddress' and id != $iUserId"));
-    if ($iEmailUsed) echo 'used';
-    else echo 'not used';
+    echo $oUser->checkUserEmail($sEmailAddress);
     die;
 }
 elseif ($sCommand == 'CheckOldPassword' && $iUserId) {
     $oUser = new User();
     $oUser->iUserId = $iUserId;
     $oUser->getUser();
-    if ($oUser->sPassword === md5($sOldPassword)) echo 'same';
+    if (password_verify($sOldPassword, $oUser->sPassword)) echo 'same';
+    else echo 'not same';
     die;
 }
 elseif($sCommand == 'UploadProfilePicture' && $iUserId) {

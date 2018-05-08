@@ -6,7 +6,7 @@
  * Time: 9:32 AM
  */
 
-$maximumNumber = isset($_POST['maximum']) ? $_POST['maximum'] : 9;
+$maximumNumber = isset($_POST['maximum']) ? $_POST['maximum'] : 34;
 
 function fibonacci($number)
 {
