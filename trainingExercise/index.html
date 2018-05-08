@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Homepage</title>
+    <title>Home</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -48,7 +48,8 @@
                 </table>
             </div>
             <div class="panel panel-primary">
-                <div class="panel-heading"><h3 class="panel-title">Updates</h3></div>
+                <div class="panel-heading"><h3 class="panel-title">Updates <span class="glyphicon glyphicon-refresh" aria-hidden="true" id="Refresh" style="float: right; cursor: pointer;" title="Refresh" onclick="$(this).fadeOut(); reloadPosts();"></span></h3></div>
+                <div id="loading" style="width: 100%; text-align: center; display: none;"><i class="fa fa-spinner fa-spin" style="font-size:46px;"></i></div>
                 <div class="panel-body" id="PostListDiv"></div>
             </div>
         </div>
@@ -68,11 +69,12 @@
 
     function postPost()
     {
+        checkIfLoggedIn();
         $('#postText').val($.trim($('#postText').val()));
         if ($('#postText').val() != '') {
             $.post('posts.php', {'command': 'Create', 'PostText': $('#postText').val()}, function() {
                 $.post('posts.php', {'command': 'GetAllPosts'}, function(response){
-                    $('#PostListDiv').html(response);
+                   reloadPosts();
                     $('#postText').val('');
                 });
             });
@@ -87,10 +89,18 @@
         }
     }
 
-    $(function(){
-        $.post('posts.php', {'command': 'GetAllPosts'}, function(response){
-            $('#PostListDiv').html(response);
+    function reloadPosts() {
+        checkIfLoggedIn();
+        $('#loading').fadeIn();
+        $('#PostListDiv').fadeOut();
+        $.post('posts.php', {'command': 'GetAllPosts', 'Limit': 10, 'Offset': 0}, function (response) {
+            $('#PostListDiv').fadeIn('slow', function() { $(this).html(response); $('#loading').fadeOut(); });
+            $('#Refresh').fadeIn('slow');
         });
+    }
+
+    $(function(){
+        reloadPosts();
     })
 </script>
 </body>

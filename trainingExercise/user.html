@@ -60,6 +60,10 @@
                         <label for="Username">Username</label>
                         <input type="text" class="form-control" placeholder="Username" id="Username" required data-validation="required" maxlength="127" onkeyup="submitInputs(event)">
                     </div>
+                    <!--  <div class="form-group">
+                          <label for="fileuploader">Profile Picture (PNG, JPG)</label>
+                          <input type="file" class="form-control" placeholder="Profile Picture" id="ProfilePicture" accept=".jpg, .jpeg, .png" onkeyup="submitInputs(event)">
+                    </div>-->
                     <div class="form-group">
                         <label for="OldPassword">Old Password</label>
                         <input type="password" class="form-control" placeholder="Old Password" id="OldPassword" autocomplete="false" onkeyup="submitInputs(event)">
@@ -103,7 +107,32 @@ $(function(){
     }, "json");
 });
 
-function updateUser() {
+function checkUsername(){
+    $.post('user.php', {'command': 'CheckUsername', 'Username': $('#Username').val()}, function(response){
+        if (response == 'not used') {
+            checkEmail(); }
+        else
+        {
+            $('#errorDiv').fadeIn().html('<div class="alert alert-danger" role="alert" id="errorDivMessage"><b>Username already being used!</b></div>');
+            $('#errorDiv').delay(1200).fadeOut();
+        }
+    });
+}
+
+function checkEmail(){
+    $.post('user.php', {'command': 'CheckEmail', 'EmailAddress': $('#EmailAddress').val()}, function(response){
+        if (response == 'not used') {
+            checkAll(); }
+        else
+        {
+            $('#errorDiv').fadeIn().html('<div class="alert alert-danger" role="alert" id="errorDivMessage"><b>Email Address already being used!</b></div>');
+            $('#errorDiv').delay(1200).fadeOut();
+        }
+    });
+}
+
+function checkAll(){
+
     if (validation()) {
         if ($('#NewPassword').val() != '') {
             if ($('#OldPassword').val() != '') {
@@ -161,6 +190,10 @@ function updateUser() {
     }
 }
 
+function updateUser() {
+    checkUsername();
+}
+
 function validation(clearErrors=0){
     var returnVal = true;
     var errors = '';
@@ -193,7 +226,7 @@ function validation(clearErrors=0){
         }
         else
         {
-            console.log($(this).val().length);
+            //console.log($(this).val().length);
         }
     });
 

@@ -8,7 +8,7 @@
 
 require_once 'connect.php';
 
-session_destroy();
+if (isset($_SESSION['UserId'])) session_destroy();
 
 header('Location: login.html');
 die;
